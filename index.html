@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Bengkel Prabu</title>
+    <style>
+        /* --- CSS Global --- */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f6f9; 
+            color: #333;
+        }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* --- CSS Form Auth --- */
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { border: 1px solid #ccc; padding: 30px; border-radius: 8px; width: 100%; max-width: 400px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card h2 { margin-top: 0; margin-bottom: 20px; color: #007bff; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="password"], textarea, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        
+        .btn { padding: 10px 15px; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .btn-blue { background-color: #007bff; width: 100%; }
+        .btn-blue:hover { background-color: #0056b3; }
+        .btn-green { background-color: #28a745; width: 100%; }
+        .btn-green:hover { background-color: #218838; }
+        
+        /* Button Aksi Form */
+        .btn-submit { background-color: #28a745; font-weight: bold; margin-top: 10px; }
+        .btn-submit:hover { background-color: #218838; }
+        .btn-update { background-color: #ffc107; color: #212529; font-weight: bold; margin-top: 10px; }
+        .btn-update:hover { background-color: #e0a800; }
+        
+        .link { margin-top: 15px; text-align: center; font-size: 14px; }
+        .link span { color: #007bff; cursor: pointer; text-decoration: underline; }
+
+        /* --- CSS Dashboard --- */
+        .navbar { color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .bg-client { background-color: #007bff; }
+        .bg-developer { background-color: #343a40; border-bottom: 2px solid #20c997; }
+        .text-dev { color: #20c997; }
+        
+        .container { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        .box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #333; }
+        .box-dark { background: #2c3034; color: #f8f9fa; border: 1px solid #495057; }
+        
+        .grid-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-dashboard { grid-template-columns: 1fr; } }
+
+        .logout-btn { background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .logout-btn:hover { background-color: #bd2130; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .box-dark th, .box-dark td { border: 1px solid #495057; }
+        th { background-color: #f2f2f2; }
+        .box-dark th { background-color: #343a40; color: #20c997; }
+    </style>
+</head>
+<body>
+
+    <section id="page-login" class="page active">
+        <div class="auth-container">
+            <div class="card">
+                <h2>Login Bengkel Prabu</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="login-username" placeholder="Masukkan username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" placeholder="Masukkan password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Masuk Sebagai</label>
+                        <select id="login-role">
+                            <option value="client">Client / Pelanggan</option>
+                            <option value="developer">Developer / Admin</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-blue" onclick="prosesLogin()">Login</button>
+                </form>
+                <div class="link">
+                    Belum punya akun? <span onclick="pindahHalaman('page-register')">Daftar di sini</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-register" class="page">
+        <div class="auth-container">
+            <div class="card">
+                <h2>Pendaftaran Akun</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Username Baru</label>
+                        <input type="text" placeholder="Buat username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Buat password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Daftar Sebagai</label>
+                        <select>
+                            <option value="client">Client / Pelanggan</option>
+                            <option value="developer">Developer / Admin</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-green" onclick="prosesDaftar()">Daftar Akun</button>
+                </form>
+                <div class="link">
+                    Sudah punya akun? <span onclick="pindahHalaman('page-login')">Login di sini</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-client" class="page">
+        <div class="navbar bg-client">
+            <h2>Dashboard Client - Bengkel Prabu</h2>
+            <button class="logout-btn" onclick="pindahHalaman('page-login')">Log Out</button>
+        </div>
+        <div class="container">
+            
+            <div class="grid-dashboard">
+                
+                <div class="box">
+                    <h3>📝 Form Pendaftaran & Edit Servis</h3>
+                    <p>Silakan isi atau edit data kendaraan serta kendala teknis Anda di bawah ini:</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+                    
+                    <div class="form-group">
+                        <label>Nama Client / Pemilik</label>
+                        <input type="text" id="client-input-nama" value="Pebriansyah" placeholder="Masukkan nama Anda">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nama Kendaraan</label>
+                        <input type="text" id="client-input-kendaraan" value="Honda Vario" placeholder="Contoh: Honda Vario">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nomor Plat Kendaraan</label>
+                        <input type="text" id="client-input-plat" value="B 1234 ABC" placeholder="Contoh: B 1234 ABC">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kendala / Keluhan Kerusakan</label>
+                        <textarea id="client-input-kendala" rows="3" placeholder="Sebutkan kendala mesin atau bagian yang ingin diperbaiki...">Ganti oli dan rem belakang blong.</textarea>
+                    </div>
+                    
+                    <button type="button" class="btn btn-submit" onclick="clientSimpanData()">Simpan & Perbarui Data Servis</button>
+                </div>
+
+                <div class="box" style="background-color: #fff;">
+                    <h3>Selamat Datang, Pelanggan Setia!</h3>
+                    <p>Di sini Anda dapat melihat status perbaikan kendaraan Anda, riwayat servis, serta melakukan booking jadwal montir.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+                    
+                    <h4 style="color: #007bff; margin-top: 0;">Status Servis Terkini:</h4>
+                    <p><strong>Nama Pemilik:</strong> <span id="client-display-nama">Pebriansyah</span></p>
+                    <p><strong>Kendaraan:</strong> <span id="client-display-kendaraan">Honda Vario (B 1234 ABC)</span></p>
+                    <p><strong>Kendala/Keluhan:</strong> <span id="client-display-kendala">Ganti oli dan rem belakang blong.</span></p>
+                    <p><strong>Status Pengerjaan:</strong> <span id="client-display-status" style="color: #ffc107; font-weight: bold;">Sedang Dikerjakan</span></p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="page-developer" class="page" style="background-color: #212529; min-height: 100vh;">
+        <div class="navbar bg-developer">
+            <h2 class="text-dev">Panel Developer & Admin</h2>
+            <button class="logout-btn" onclick="pindahHalaman('page-login')">Log Out</button>
+        </div>
+        <div class="container">
+            <div class="box box-dark">
+                <h3 class="text-dev">⚙️ Kontrol Status Servis (Oleh Admin)</h3>
+                <p>Ubah status pengerjaan montir untuk kendaraan client secara langsung.</p>
+                
+                <div class="form-group">
+                    <label>Status Kerja Montir</label>
+                    <select id="admin-input-status">
+                        <option value="Antrean">Antrean</option>
+                        <option value="Sedang Dikerjakan" selected>Sedang Dikerjakan</option>
+                        <option value="Selesai / Siap Diambil">Selesai / Siap Diambil</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-update" onclick="adminUpdateStatus()">Perbarui Status Kerja Montir</button>
+            </div>
+
+            <div class="box box-dark">
+                <h3 class="text-dev">Sistem Kendali Utama (Backend Simulator)</h3>
+                <p>Monitoring database pengguna terdaftar pada sistem.</p>
+                <h4>Data Pengguna Terdaftar</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Role Hak Akses</th>
+                            <th>Status Kendali</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Pebriansyah</td>
+                            <td>Client</td>
+                            <td style="color: #28a745;">Aktif</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Prabu_Dev</td>
+                            <td>Developer</td>
+                            <td style="color: #28a745;">Aktif</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Fungsi dasar pindah halaman
+        function pindahHalaman(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Fungsi Simulasi Login
+        function prosesLogin() {
+            const role = document.getElementById('login-role').value;
+            if (role === 'client') {
+                pindahHalaman('page-client');
+            } else if (role === 'developer') {
+                pindahHalaman('page-developer');
+            }
+        }
+
+        // Fungsi Simulasi Daftar
+        function prosesDaftar() {
+            alert('Pendaftaran Berhasil! Silahkan login.');
+            pindahHalaman('page-login');
+        }
+
+        // --- FITUR EDIT DATA OLEH CLIENT ---
+        function clientSimpanData() {
+            // Mengambil inputan dari form client
+            const namaInput = document.getElementById('client-input-nama').value;
+            const kendaraanInput = document.getElementById('client-input-kendaraan').value;
+            const platInput = document.getElementById('client-input-plat').value;
+            const kendalaInput = document.getElementById('client-input-kendala').value;
+
+            // Memperbarui text element display di dashboard client sebelah kanan
+            document.getElementById('client-display-nama').innerText = namaInput;
+            document.getElementById('client-display-kendaraan').innerText = kendaraanInput + " (" + platInput + ")";
+            document.getElementById('client-display-kendala').innerText = kendalaInput;
+
+            alert('Data Anda berhasil disimpan dan diperbarui pada sistem!');
+        }
+
+        // --- FITUR KONTROL STATUS OLEH ADMIN ---
+        function adminUpdateStatus() {
+            const statusBaru = document.getElementById('admin-input-status').value;
+            
+            // Mengubah status di sisi client
+            const statusText = document.getElementById('client-display-status');
+            statusText.innerText = statusBaru;
+
+            // Pewarnaan indikator teks status
+            if (statusBaru === "Antrean") {
+                statusText.style.color = "#dc3545"; // Merah
+            } else if (statusBaru === "Sedang Dikerjakan") {
+                statusText.style.color = "#ffc107"; // Kuning
+            } else {
+                statusText.style.color = "#28a745"; // Hijau
+            }
+
+            alert('Status pengerjaan berhasil diperbarui menjadi: ' + statusBaru);
+        }
+    </script>
+
+</body>
+</html>
